@@ -1,0 +1,31 @@
+version: '2.3'
+
+services:
+  polyglot:
+    container_name: polyglot
+    build:
+      context: .
+    mem_limit: 512m
+    entrypoint:
+    - java
+    - "-Djava.security.egd=file:/dev/./urandom"
+    - "-XX:MaxRAMPercentage=75"
+    - "-jar"
+    - "/app.jar"
+
+  spring-cloud-contract:
+    container_name: spring-cloud-contract-polyglot
+    image: springcloud/spring-cloud-contract:2.1.0.BUILD-SNAPSHOT
+    volumes:
+    - ./contracts:/contracts:ro
+    environment:
+      PROJECT_GROUP: org.t4atf.contract
+      PROJECT_NAME: polyglot
+      PUBLISH_ARTIFACTS: "false"
+      APPLICATION_BASE_URL: http://polyglot:8080
+    depends_on:
+      polyglot:
+        condition: service_healthy
+
+networks:
+  default:

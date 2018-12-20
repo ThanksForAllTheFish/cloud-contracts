@@ -1,0 +1,65 @@
+== Possible Bug?
+
+Given this code, the following test is generated:
+
+```
+@Test
+public void validate_actuator() throws Exception {
+	// given:
+		RequestSpecification request = given();
+
+	// when:
+		Response response = given().spec(request)
+				.get("/list");
+
+	// then:
+		assertThat(response.statusCode()).isEqualTo(200);
+	// and:
+		DocumentContext parsedJson = JsonPath.parse(response.getBody().asString());
+		assertThatJson(parsedJson).field("['content']").field("['three']").isEmpty();
+		assertThatJson(parsedJson).field("['content']").field("['two']").isEqualTo("two");
+	// and:
+		assertThat(parsedJson.read("$.content.three.six", String.class)).matches(".*seven.*");
+		assertThat(parsedJson.read("$.content.one", String.class)).matches(".*two.*");
+}
+```
+
+The bug is already marked as solved: https://github.com/spring-cloud/spring-cloud-contract/issues/727
+
+=== How to reproduce
+
+Simply follow these steps:
+
+- `./gradlew build` to generate the jar file to run the test against
+- `docker-compose up -d --build` to run contract tests using `springcloud/spring-cloud-contract:2.1.0.BUILD-SNAPSHOT` docker image
+- `docker cp spring-cloud-contract-polyglot:/spring-cloud-contract/build/generated-test-sources generated-test-sources` to copy the generated tests.
+
+At this point, the test is visible is `./generated-test-sources/contracts/contracts`
+
+=== Issue
+
+Imo, the test should look like
+
+```
+@Test
+public void validate_actuator() throws Exception {
+	// given:
+		RequestSpecification request = given();
+
+	// when:
+		Response response = given().spec(request)
+				.get("/list");
+
+	// then:
+		assertThat(response.statusCode()).isEqualTo(200);
+	// and:
+		DocumentContext parsedJson = JsonPath.parse(response.getBody().asString());
+		// No line assertThatJson(parsedJson).field("['content']").field("['three']").isEmpty(); here
+		assertThatJson(parsedJson).field("['content']").field("['two']").isEqualTo("two");
+	// and:
+		assertThat(parsedJson.read("$.content.three.six", String.class)).matches(".*seven.*");
+		assertThat(parsedJson.read("$.content.one", String.class)).matches(".*two.*");
+}
+```
+
+The problem seems to be there only for nested maps, as test is generated as expected for `$.content.one`
