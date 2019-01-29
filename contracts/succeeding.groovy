@@ -10,8 +10,7 @@ Contract.make {
 		body(
 			[
 				content: [
-					one: "two",
-					two: "two",
+					two: "something",
 					three: [
 						six: "seven"
 					]
@@ -20,7 +19,7 @@ Contract.make {
 		)
 		bodyMatchers {
 			jsonPath('$.content.three.six', byRegex(".*seven.*"))
-			jsonPath('$.content.one', byRegex(".*two.*"))
+			jsonPath('$.content.two', byRegex(".*two.*"))
 		}
 	}
 }

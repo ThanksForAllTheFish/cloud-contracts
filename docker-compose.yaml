@@ -15,7 +15,7 @@ services:
 
   spring-cloud-contract:
     container_name: spring-cloud-contract-polyglot
-    image: springcloud/spring-cloud-contract:2.1.0.BUILD-SNAPSHOT
+    image: springcloud/spring-cloud-contract:2.1.1.BUILD-SNAPSHOT
     volumes:
     - ./contracts:/contracts:ro
     environment:

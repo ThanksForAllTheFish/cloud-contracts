@@ -16,8 +16,8 @@ fun main(args: Array<String>) {
 @RestController
 class Controller {
 	@GetMapping("/list", produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
-	fun links() = mapOf("content" to
-			mapOf("one" to "two",
-				"two" to "two",
-				"three" to mapOf("six" to "seven")))
+	fun links() = mapOf(
+		"content" to mapOf(
+			"two" to "two",
+			"three" to mapOf("six" to "seven")))
 }
